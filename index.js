@@ -72,7 +72,7 @@ WHERE
                 }
             });
 });
-app.post('/vol/add', (req, res) => {
+app.get('/vol/add', (req, res) => {
     const {name, price} = req.query;
     const queryAjout = `INSERT INTO vol (name, price) VALUES ('${name}', '${price}')`;
     connection.query(queryAjout, (err, results) => {
@@ -80,7 +80,76 @@ app.post('/vol/add', (req, res) => {
             return res.send(err)
         }
         else {
-            return res.send('succesfully')
+            connection.query('SELECT LAST_INSERT_ID()', (err, results) => {
+                if(err){
+                    return res.send(err)
+                }
+                return res.json({
+                    data: results
+                })
+            });
+        }
+    });
+});
+
+app.get('/client/add', (req, res) => {
+    const {nomClient, prenomClient, mailClient} = req.query;
+    const queryAjoutClient = `INSERT INTO client (nomClient, prenomClient, mailClient) VALUES ('${nomClient}', '${prenomClient}', '${mailClient}')`;
+    connection.query(queryAjoutClient, (err, results) => {
+        if(err){
+            return res.send(err)
+        }
+        else {
+            connection.query('SELECT LAST_INSERT_ID()', (err, results) => {
+                if(err){
+                    return res.send(err)
+                }
+                return res.json({
+                    data: results
+                })
+            });
+        }
+    });
+});
+
+app.get('/commande/add', (req, res) => {
+    const {noClient} = req.query;
+    const dateNow = Date.now();
+    const queryAjoutCommande = `INSERT INTO commande (noClient, dateCreation) VALUES ('${noClient}', '${dateNow}'); SELECT LAST_INSERT_ID();`;
+    connection.query(queryAjoutCommande, (err, results) => {
+        if(err){
+            return res.send(err)
+        }
+        else {
+            connection.query('SELECT LAST_INSERT_ID()', (err, results) => {
+                if(err){
+                    return res.send(err)
+                }
+                return res.json({
+                    data: results
+                })
+            });
+        }
+    });
+});
+
+app.get('/billet/add', (req, res) => {
+    const {idPassager, idVol, idCommande, dateDepart, dateArrivee} = req.query;
+
+    const queryAjoutBillet = `INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('${idPassager}', '${idVol}', '${idCommande}', '${dateDepart}', '${dateArrivee}')`;
+    connection.query(queryAjout, (err, results) => {
+        if(err){
+            return res.send(err)
+        }
+        else {
+            connection.query('SELECT LAST_INSERT_ID()', (err, results) => {
+                if(err){
+                    return res.send(err)
+                }
+                else{
+                    return res.send({idCommande : idCommande});
+                }
+            });
         }
     });
 });
@@ -89,5 +158,5 @@ app.post('/vol/add', (req, res) => {
 
 
 app.listen(process.env.PORT || 3000, () => {
-    console.log("Products server listening on port "+ (process.env.PORT || 3000 ) )
+    console.log("Air France's server listening on port "+ (process.env.PORT || 3000 ) )
 });
