@@ -55,7 +55,7 @@ app.get('/vol', (req, res) => {
 app.get('/vol/query', (req, res) => {
     const {dateDepart, dateArrivee, idAeroportDepart, idAeroportArrivee} = req.query;
 
-    const querySelectVol = `SELECT vol.idVol , aeroport1.nomAeroport AS "Depart", aeroport2.nomAeroport AS "Arrivee", vol.prixVol 
+    const querySelectVol = `SELECT vol.idVol , aeroport1.nomAeroport AS "Depart", aeroport1.idAeroport AS "idDepart", aeroport2.nomAeroport AS "Arrivee", aeroport2.idAeroport AS "idArrivee", vol.prixVol 
 FROM vol AS vol
 JOIN aeroport AS aeroport1 ON vol.noAeroportDepart = aeroport1.idAeroport
 JOIN aeroport AS aeroport2 ON vol.noAeroportArrivee = aeroport2.idAeroport
