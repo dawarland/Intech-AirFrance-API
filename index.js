@@ -137,7 +137,7 @@ app.get('/billet/add', (req, res) => {
     const {idPassager, idVol, idCommande, dateDepart, dateArrivee} = req.query;
 
     const queryAjoutBillet = `INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('${idPassager}', '${idVol}', '${idCommande}', '${dateDepart}', '${dateArrivee}')`;
-    connection.query(queryAjout, (err, results) => {
+    connection.query(queryAjoutBillet, (err, results) => {
         if(err){
             return res.send(err)
         }
@@ -148,6 +148,29 @@ app.get('/billet/add', (req, res) => {
                 }
                 else{
                     return res.send({idCommande : idCommande});
+                }
+            });
+        }
+    });
+});
+
+app.get('/passager/add', (req, res) => {
+    const {nomPassager, prenomPassager} = req.query;
+
+    const queryAjoutPassager = `INSERT INTO passager (nomPassager, prenomPassager) VALUES ('${nomPassager}', '${prenomPassager}')`;
+    connection.query(queryAjoutPassager, (err, results) => {
+        if(err){
+            return res.send(err)
+        }
+        else {
+            connection.query('SELECT LAST_INSERT_ID()', (err, results) => {
+                if(err){
+                    return res.send(err)
+                }
+                else{
+                    return res.json({
+                        data: results
+                    })
                 }
             });
         }
