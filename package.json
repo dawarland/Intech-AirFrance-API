@@ -3,12 +3,16 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "ejs": "latest",
     "aws-sdk": "latest",
-    "express": "latest",
     "body-parser": "latest",
-    "mysql": "latest",
-    "cors": "latest"
+    "cors": "latest",
+    "dotenv": "^8.2.0",
+    "ejs": "latest",
+    "express": "latest",
+    "helmet": "^4.1.0",
+    "helnet": "^1.0.0",
+    "morgan": "^1.10.0",
+    "mysql": "latest"
   },
   "scripts": {
     "start": "node index.js"
