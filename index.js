@@ -53,23 +53,15 @@ app.get('/vol', (req, res) => {
     });
 });
 app.get('/vol/query', (req, res) => {
-    const {nom, prenom, dateDepart, dateArrivee, idAeroportDepart, idAeroportArrivee} = req.query;
+    const {dateDepart, dateArrivee, idAeroportDepart, idAeroportArrivee} = req.query;
 
-    const queryAjoutUser = `INSERT INTO passager (nomPassager, prenomPassager) VALUES ('${nom}', '${prenom}')`;
-    // const querySelectVol = `SELECT * FROM vol WHERE noAeroportDepart = ${idAeroportDepart} OR noAeroportDepart = ${idAeroportDepart}`;
     const querySelectVol = `SELECT vol.idVol , aeroport1.nomAeroport AS "Depart", aeroport2.nomAeroport AS "Arrivee", vol.prixVol 
 FROM vol AS vol
 JOIN aeroport AS aeroport1 ON vol.noAeroportDepart = aeroport1.idAeroport
 JOIN aeroport AS aeroport2 ON vol.noAeroportArrivee = aeroport2.idAeroport
 WHERE
  noAeroportDepart = ${idAeroportDepart} OR noAeroportArrivee = ${idAeroportArrivee} OR noAeroportDepart = ${idAeroportArrivee} OR noAeroportArrivee = ${idAeroportDepart}`;
-    connection.query(queryAjoutUser, (err, results) => {
-        if(err){
-            console.log("erreur insert user");
-            return res.send(err)
-        }
-        else {
-            connection.query(querySelectVol, (err, results) => {
+    connection.query(querySelectVol, (err, results) => {
                 if(err){
                     return res.send(err)
                 }
@@ -79,8 +71,6 @@ WHERE
                     })
                 }
             });
-        }
-    });
 });
 app.post('/vol/add', (req, res) => {
     const {name, price} = req.query;
