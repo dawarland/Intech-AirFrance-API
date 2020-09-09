@@ -98,6 +98,6 @@ app.post('/vol/add', (req, res) => {
 
 
 
-app.listen(4000, () => {
-    console.log("Products server listening on port 4000")
+app.listen(process.env.PORT || 3000, () => {
+    console.log("Products server listening on port "+ (process.env.PORT || 3000 ) )
 });
