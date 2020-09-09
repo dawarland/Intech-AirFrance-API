@@ -115,7 +115,7 @@ app.get('/client/add', (req, res) => {
 app.get('/commande/add', (req, res) => {
     const {noClient} = req.query;
     const dateNow = Date.now();
-    const queryAjoutCommande = `INSERT INTO commande (noClient, dateCreation) VALUES ('${noClient}', '${dateNow}')`;
+    const queryAjoutCommande = `INSERT INTO commande (noClient, dateCreation) VALUES ('${noClient}', now())`;
     connection.query(queryAjoutCommande, (err, results) => {
         if(err){
             return res.send(err)
