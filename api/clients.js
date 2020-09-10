@@ -36,4 +36,24 @@ router.get('/', async (req, res, next) => {
     }
 });
 
+router.get('/:email', async (req, res, next) => {
+
+    const { email } = req.params;
+
+    try {
+        connection.query(SELECT_ALL_QUERY+" WHERE mailClient ='"+email+"'", (err, results) => {
+            if(err){
+                return res.send(err)
+            }
+            else {
+                return res.json({
+                    data: results
+                })
+            }
+        });
+    } catch (e) {
+        return next(e);
+    }
+});
+
 module.exports = router;
