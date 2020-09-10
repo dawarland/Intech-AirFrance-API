@@ -75,7 +75,7 @@ router.post('/add', (req, res, next) => {
                                                     if (err) return next(err);
                                                     else {
                                                         vols.forEach((v) => {
-                                                            connection.query("INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('" + p.idPassager + "', '" + v + "', '" + JSON.parse(JSON.stringify(results))[0]["LAST_INSERT_ID()"][0] + "', '" + dateDepart + "', '" + dateArrivee + "')", (err, results) => {
+                                                            connection.query("INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('" + (JSON.parse(JSON.stringify(results))[0]["LAST_INSERT_ID()"]) + "', '" + v + "', '" + JSON.parse(JSON.stringify(results))[0]["LAST_INSERT_ID()"][0] + "', '" + dateDepart + "', '" + dateArrivee + "')", (err, results) => {
                                                                 if (err) return next(err);
                                                                 console.log(results);
                                                             });
