@@ -3,7 +3,7 @@ function generateRequestBillet(vols, passagers, idCommande, dateDepart, dateArri
     passagers.forEach( (p) => {
         requests.push("INSERT INTO passager (nomPassager, prenomPassager) VALUES ('"+p.nomPassager+"', '"+ p.prenomPassager+"')");
         vols.forEach( (v) => {
-            requests.push("INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('"+p.idPassager+"', '"+v+"', '"+idCommande+"', '"+dateDepart+"', '"+dateArrivee+")");
+            requests.push("INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('"+p.idPassager+"', '"+v+"', '"+idCommande+"', '"+dateDepart+"', '"+dateArrivee+"')");
         });
     });
     return requests;
