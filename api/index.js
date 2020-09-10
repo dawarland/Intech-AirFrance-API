@@ -6,6 +6,7 @@ const clients = require('./clients');
 const commandes = require('./commandes');
 const passagers = require('./passagers');
 const vols = require('./vols');
+const ext = require('./ext');
 
 const router = express.Router();
 
@@ -21,5 +22,6 @@ router.use('/client', clients);
 router.use('/commande', commandes);
 router.use('/passager', passagers);
 router.use('/vol', vols);
+router.use('/ext', ext);
 
 module.exports = router;

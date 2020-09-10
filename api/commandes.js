@@ -184,11 +184,12 @@ router.get('/tarif/:idCommande', async (req, res, next) => {
             "        ON billet.noPassager = passager.idPassager" +
             "    WHERE " +
             "    billet.noCommande=" +idCommande+
-            ") AS PrixTotal  GROUP BY idPassager", (err, results) => {
+            ") AS PrixTotal", (err, results) => {
             if(err){
                 return next(err);
             }
             else {
+                console.log(results);
                 let sumPrixVol = results[0]["SUM(prixVol)"];
                 let nbVol = results[0]["COUNT(idVol)"];
                 let nbPassager = results[0]["COUNT(idPassager)"];
@@ -216,6 +217,25 @@ router.put('/paye/:idCommande', async (req, res, next) => {
     try {
         connection.query("UPDATE commande SET paye=true WHERE idCommande='"+idCommande+"'", (err, results) => {
             if(err){
+                console(err);
+                return next(err);
+            }
+            else {
+                return res.json({
+                    data: results
+                })
+            }
+        });
+    } catch (e) {
+        return next(e);
+    }
+});
+router.get('/paye/:idCommande', async (req, res, next) => {
+    const { idCommande } = req.params;
+    try {
+        connection.query("UPDATE commande SET paye=true WHERE idCommande='"+idCommande+"'", (err, results) => {
+            if(err){
+                console(err);
                 return next(err);
             }
             else {
