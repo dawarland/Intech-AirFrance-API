@@ -74,19 +74,19 @@ router.post('/add', (req, res, next) => {
 
                                                 let noCommande = JSON.parse(JSON.stringify(results))[0]["LAST_INSERT_ID()"];
 
-                                                passagers.forEach((p) => {
-                                                    connection.query("INSERT INTO passager (nomPassager, prenomPassager) VALUES ('" + p.nomPassager + "', '" + p.prenomPassager + "')", (err, results) => {
+                                                passagers.forEach(async (p) => {
+                                                    let c = await connection.query("INSERT INTO passager (nomPassager, prenomPassager) VALUES ('" + p.nomPassager + "', '" + p.prenomPassager + "')", (err, results) => {
                                                         if (err) {
                                                             return next(err);
                                                         } else {
-                                                            connection.query('SELECT LAST_INSERT_ID()', (err, results) => {
+                                                            connection.query('SELECT LAST_INSERT_ID()', (err, results1) => {
                                                                 if (err) return next(err);
                                                                 else {
                                                                     vols.forEach((v) => {
-                                                                        console.log(noCommande);
-                                                                        connection.query("INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('" + (JSON.parse(JSON.stringify(results))[0]["LAST_INSERT_ID()"]) + "', '" + v + "', '" + noCommande + "', '" + dateDepart + "', '" + dateArrivee + "')", (err, results) => {
+                                                                        console.log((JSON.parse(JSON.stringify(results1))[0]["LAST_INSERT_ID()"]));
+                                                                        connection.query("INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('" + (JSON.parse(JSON.stringify(results1))[0]["LAST_INSERT_ID()"]) + "', '" + v + "', '" + noCommande + "', '" + dateDepart + "', '" + dateArrivee + "')", (err, results2) => {
                                                                             if (err) return next(err);
-                                                                            console.log(results);
+                                                                            console.log(results2);
                                                                         });
                                                                     });
                                                                 }
@@ -117,26 +117,30 @@ router.post('/add', (req, res, next) => {
 
                                 let noCommande = JSON.parse(JSON.stringify(results))[0]["LAST_INSERT_ID()"];
 
-                                passagers.forEach((p) => {
+                                for (let i = 0; i<passagers.length; i++) {
+                                    let p = passagers[i];
+                                //passagers.forEach(async (p) => {
                                     connection.query("INSERT INTO passager (nomPassager, prenomPassager) VALUES ('" + p.nomPassager + "', '" + p.prenomPassager + "')", (err, results) => {
                                         if (err) {
                                             return next(err);
                                         } else {
-                                            connection.query('SELECT LAST_INSERT_ID()', (err, results) => {
+                                            console.log("creation passager ",results);
+                                            connection.query('SELECT LAST_INSERT_ID()', (err, results1) => {
                                                 if (err) return next(err);
                                                 else {
-                                                    vols.forEach((v) => {
-                                                        console.log(noCommande);
-                                                        connection.query("INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('" + (JSON.parse(JSON.stringify(results))[0]["LAST_INSERT_ID()"]) + "', '" + v + "', '" + noCommande + "', '" + dateDepart + "', '" + dateArrivee + "')", (err, results) => {
+                                                    for (const v of vols) {
+                                                        console.log("Utilisateur ",(JSON.parse(JSON.stringify(results1))[0]["LAST_INSERT_ID()"]));
+                                                        connection.query("INSERT INTO billet (noPassager, noVol, noCommande, dateDepart, dateArrivee) VALUES ('" + (JSON.parse(JSON.stringify(results1))[0]["LAST_INSERT_ID()"]) + "', '" + v + "', '" + noCommande + "', '" + dateDepart + "', '" + dateArrivee + "')", (err, results2) => {
                                                             if (err) return next(err);
-                                                            console.log(results);
+                                                            console.log(results2);
                                                         });
-                                                    });
+                                                    };
                                                 }
                                             });
                                         }
                                     });
-                                });
+                                    //createBilletsWithPassager(p.nomPassager, p.prenomPassager, vols, noCommande, dateDepart, dateArrivee, next)
+                                }
                                 res.json({
                                     data: results
                                 })
@@ -153,7 +157,7 @@ router.get('/:idCommande', async (req, res, next) => {
     try {
         connection.query(SELECT_ALL_QUERY+" WHERE idCommande='"+idCommande+"'", (err, results) => {
             if(err){
-                return res.send(err)
+                return next(err);
             }
             else {
                 return res.json({
@@ -165,5 +169,64 @@ router.get('/:idCommande', async (req, res, next) => {
         return next(e);
     }
 });
+
+router.get('/paye/:idCommande', async (req, res, next) => {
+    const { idCommande } = req.params;
+    try {
+        connection.query("SELECT SUM(prixVol), COUNT(idVol), COUNT(idPassager)\n" +
+            "FROM (" +
+            "    SELECT vol.idVol, vol.prixVol, passager.idPassager " +
+            "    FROM vol" +
+            "    INNER JOIN billet" +
+            "        ON billet.noVol = vol.idVol" +
+            "    INNER JOIN passager" +
+            "        ON billet.noPassager = passager.idPassager" +
+            "    WHERE " +
+            "    billet.noCommande=" +idCommande+
+            ") AS PrixTotal", (err, results) => {
+            if(err){
+                return next(err);
+            }
+            else {
+                let prixVol = results[0]["SUM(prixVol)"];
+                let nbVol = results[0]["COUNT(idVol)"];
+                let nbPassager = results[0]["COUNT(idPassager)"];
+
+                return res.json({
+                    data: results
+                })
+            }
+        });
+    } catch (e) {
+        return next(e);
+    }
+});
+
+router.get('/informations/:idCommande', async (req, res, next) => {
+    const { idCommande } = req.params;
+    try {
+        connection.query("SELECT idBillet, dateDepart, dateArrivee, noPassager, noVol, nomPassager, prenomPassager, prixVol, aeroport1.nomAeroport AS \"Depart\", aeroport1.idAeroport AS \"idDepart\", aeroport2.nomAeroport AS \"Arrivee\", aeroport2.idAeroport AS \"idArrivee\", noClient, dateCreation, prixTotal, nomClient, mailClient " +
+            " FROM billet" +
+            " INNER JOIN passager ON billet.noPassager = passager.idPassager" +
+            " INNER JOIN vol ON billet.noVol = vol.idVol " +
+            " INNER JOIN aeroport AS aeroport1 ON vol.noAeroportDepart = aeroport1.idAeroport" +
+            "    INNER JOIN aeroport AS aeroport2 ON vol.noAeroportArrivee = aeroport2.idAeroport" +
+            " INNER JOIN commande ON billet.noCommande = commande.idCommande" +
+            " INNER JOIN client ON client.idClient = commande.noClient"+
+            " WHERE billet.noCommande='"+idCommande+"'", (err, results) => {
+            if(err){
+                return next(err);
+            }
+            else {
+                return res.json({
+                    data: results
+                })
+            }
+        });
+    } catch (e) {
+        return next(e);
+    }
+});
+
 
 module.exports = router;
