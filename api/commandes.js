@@ -1,4 +1,5 @@
 const generateRequest = require('../business/generate-request');
+const businessService = require('../business/businessService');
 
 const express = require('express');
 const mysql = require('mysql');
@@ -170,7 +171,7 @@ router.get('/:idCommande', async (req, res, next) => {
     }
 });
 
-router.get('/paye/:idCommande', async (req, res, next) => {
+router.get('/tarif/:idCommande', async (req, res, next) => {
     const { idCommande } = req.params;
     try {
         connection.query("SELECT SUM(prixVol), COUNT(idVol), COUNT(idPassager)\n" +
@@ -183,15 +184,41 @@ router.get('/paye/:idCommande', async (req, res, next) => {
             "        ON billet.noPassager = passager.idPassager" +
             "    WHERE " +
             "    billet.noCommande=" +idCommande+
-            ") AS PrixTotal", (err, results) => {
+            ") AS PrixTotal  GROUP BY idPassager", (err, results) => {
             if(err){
                 return next(err);
             }
             else {
-                let prixVol = results[0]["SUM(prixVol)"];
+                let sumPrixVol = results[0]["SUM(prixVol)"];
                 let nbVol = results[0]["COUNT(idVol)"];
                 let nbPassager = results[0]["COUNT(idPassager)"];
+                const prixTotal = businessService.calculRemise(sumPrixVol, nbVol, nbPassager);
 
+                connection.query("UPDATE commande SET prixTotal="+prixTotal+" WHERE idCommande='"+idCommande+"'", (err, results) => {
+                    if(err){
+                        return next(err);
+                    }
+                    else {
+                        return res.json({
+                            data: {"prixTotal": prixTotal}
+                        })
+                    }
+                });
+            }
+        });
+    } catch (e) {
+        return next(e);
+    }
+});
+
+router.put('/paye/:idCommande', async (req, res, next) => {
+        const { idCommande } = req.body;
+    try {
+        connection.query("UPDATE commande SET paye=true WHERE idCommande='"+idCommande+"'", (err, results) => {
+            if(err){
+                return next(err);
+            }
+            else {
                 return res.json({
                     data: results
                 })
