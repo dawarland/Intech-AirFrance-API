@@ -174,7 +174,7 @@ router.get('/:idCommande', async (req, res, next) => {
 router.get('/tarif/:idCommande', async (req, res, next) => {
     const { idCommande } = req.params;
     try {
-        connection.query("SELECT SUM(prixVol), COUNT(idVol), COUNT(idPassager)\n" +
+        connection.query("SELECT SUM(prixVol), COUNT(idVol), COUNT(idPassager)" +
             "FROM (" +
             "    SELECT vol.idVol, vol.prixVol, passager.idPassager " +
             "    FROM vol" +
