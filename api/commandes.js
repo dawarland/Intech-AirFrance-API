@@ -194,6 +194,7 @@ router.get('/tarif/:idCommande', async (req, res, next) => {
                 let nbVol = results[0]["COUNT(idVol)"];
                 let nbPassager = results[0]["COUNT(idPassager)"];
                 const prixTotal = businessService.calculRemise(sumPrixVol, nbVol, nbPassager);
+                console.log(prixTotal);
 
                 connection.query("UPDATE commande SET prixTotal="+prixTotal+" WHERE idCommande='"+idCommande+"'", (err, results) => {
                     if(err){
