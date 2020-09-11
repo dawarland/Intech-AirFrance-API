@@ -95,13 +95,13 @@ router.post('/add', (req, res, next) => {
                                                         }
                                                     });
                                                 });
-                                                res.json({
-                                                    data: results
-                                                })
                                             }
                                         });
                                     }
                                 });
+                                res.json({
+                                    data: results
+                                })
                             }
                         });
                     }
@@ -173,6 +173,7 @@ router.get('/:idCommande', async (req, res, next) => {
 
 router.get('/tarif/:idCommande', async (req, res, next) => {
     const { idCommande } = req.params;
+    console.log(idCommande);
     try {
         connection.query("SELECT SUM(prixVol), COUNT(idVol), COUNT(idPassager)" +
             "FROM (" +
