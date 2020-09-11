@@ -200,12 +200,10 @@ router.get('/tarif/:idCommande', async (req, res, next) => {
                     if(err){
                         return next(err);
                     }
-                    else {
-                        return res.json({
-                            data: {"prixTotal": prixTotal}
-                        })
-                    }
                 });
+                return res.json({
+                    data: results
+                })
             }
         });
     } catch (e) {
